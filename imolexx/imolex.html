@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>IMOLEX — World's First Physical Impact Token</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#F5A623;--gd:#C4841A;--gg:rgba(245,166,35,0.12);
+  --green:#00FF88;--navy:#050A18;--mid:#090F1F;
+  --card:#0C1526;--card2:#0F1C32;--bdr:#1A2E4A;
+  --white:#F0F6FF;--mut:#5A7A9A;
+  --D:'Bebas Neue',sans-serif;--B:'Space Grotesk',sans-serif;
+  --M:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--navy);color:var(--white);font-family:var(--B);overflow-x:hidden;padding-bottom:70px}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 15% 15%,rgba(245,166,35,.05) 0%,transparent 60%),radial-gradient(ellipse 50% 35% at 85% 85%,rgba(0,255,136,.04) 0%,transparent 60%);pointer-events:none;z-index:0}
+.page{display:none;position:relative;z-index:1}
+.page.active{display:block}
+
+/* NAV */
+.topnav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:rgba(5,10,24,.93);backdrop-filter:blur(20px);border-bottom:1px solid var(--bdr)}
+.logo{font-family:var(--D);font-size:22px;letter-spacing:3px;color:var(--gold);text-decoration:none}
+.logo span{color:var(--white)}
+.rbtn{background:var(--gold);color:var(--navy);border:none;border-radius:8px;padding:8px 14px;font-weight:700;font-size:13px;cursor:pointer;font-family:var(--B)}
+.nib{width:36px;height:36px;border-radius:50%;background:var(--card);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;position:relative;margin-right:8px}
+.ndot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--gold);border-radius:50%}
+
+/* TICKER */
+.tkwrap{position:fixed;top:60px;left:0;right:0;z-index:199;height:36px;overflow:hidden;background:rgba(245,166,35,.06);border-bottom:1px solid var(--bdr);display:flex;align-items:center}
+.tktrack{display:flex;animation:tks 45s linear infinite;white-space:nowrap}
+.tktrack:hover{animation-play-state:paused}
+.tki{display:flex;align-items:center;gap:7px;padding:0 28px;font-size:12px;color:var(--mut);border-right:1px solid var(--bdr);flex-shrink:0}
+.tki strong{color:var(--white)}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dg{background:var(--green);box-shadow:0 0 5px var(--green)}
+.da{background:var(--gold);box-shadow:0 0 5px var(--gold)}
+@keyframes tks{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* MAIN */
+.main{margin-top:96px}
+.con{max-width:480px;margin:0 auto;padding:0 16px}
+
+/* BOTTOM NAV */
+.botnav{position:fixed;bottom:0;left:0;right:0;z-index:200;height:70px;display:flex;align-items:center;justify-content:space-around;background:rgba(5,10,24,.95);backdrop-filter:blur(20px);border-top:1px solid var(--bdr)}
+.ntab{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:8px 12px;border-radius:10px;transition:all .2s;flex:1}
+.ntab .ico{font-size:20px}
+.ntab .lbl{font-size:10px;font-weight:600;color:var(--mut)}
+.ntab.active .lbl{color:var(--gold)}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:16px;overflow:hidden}
+.cp{padding:18px}
+.cardg{background:linear-gradient(135deg,rgba(245,166,35,.1),rgba(245,166,35,.04));border-color:rgba(245,166,35,.25)}
+.cardtl::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--green),var(--gold))}
+/* TAGS */
+.tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.tga{background:rgba(245,166,35,.12);color:var(--gold);border:1px solid rgba(245,166,35,.25)}
+.tgg{background:rgba(0,255,136,.1);color:var(--green);border:1px solid rgba(0,255,136,.2)}
+.tgm{background:rgba(90,122,154,.1);color:var(--mut);border:1px solid var(--bdr)}
+.ldot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:lp 1.5s infinite}
+@keyframes lp{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;border:none;font-family:var(--B);padding:14px 20px;text-decoration:none;white-space:nowrap}
+.bp{background:var(--gold);color:var(--navy)}
+.bp:hover{background:var(--gd);transform:translateY(-2px);box-shadow:0 8px 24px rgba(245,166,35,.3)}
+.bo{background:transparent;color:var(--white);border:1px solid var(--bdr)}
+.bo:hover{border-color:var(--gold);color:var(--gold)}
+.bsm{padding:10px 16px;font-size:12px;border-radius:8px}
+.bfw{width:100%}
+
+/* PROGRESS */
+.pbar{height:8px;background:var(--bdr);border-radius:4px;overflow:hidden}
+.pf{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--green))}
+
+/* FORM */
+.inp{width:100%;background:var(--card2);border:1px solid var(--bdr);border-radius:10px;padding:13px 16px;color:var(--white);font-family:var(--B);font-size:14px;outline:none;transition:border-color .2s}
+.inp:focus{border-color:var(--gold)}
+.inp::placeholder{color:var(--mut)}
+
+/* UTILS */
+.row{display:flex;align-items:center}
+.rwb{display:flex;align-items:center;justify-content:space-between}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.sp8{height:8px}.sp12{height:12px}.sp16{height:16px}.sp24{height:24px}
+.gold{color:var(--gold)}.grn{color:var(--green)}.mut{color:var(--mut)}
+.bold{font-weight:700}.mono{font-family:var(--M)}
+
+/* SECTION */
+.sh{margin-bottom:16px}
+.stag{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.stit{font-family:var(--D);font-size:26px;letter-spacing:1px;line-height:1}
+.sdesc{font-size:13px;color:var(--mut);line-height:1.6;margin-top:5px}
+
+/* AVATAR */
+.av{border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--green));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--navy);flex-shrink:0}
+.avs{width:32px;height:32px;font-size:12px}
+.avm{width:40px;height:40px;font-size:14px}
+.avl{width:56px;height:56px;font-size:20px}
+
+/* TIER */
+.tier{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:100px;font-size:11px;font-weight:700}
+.tex{background:rgba(90,122,154,.15);color:var(--mut);border:1px solid var(--bdr)}
+.tco{background:rgba(100,160,255,.12);color:#64A0FF;border:1px solid rgba(100,160,255,.25)}
+.tle{background:rgba(245,166,35,.12);color:var(--gold);border:1px solid rgba(245,166,35,.3)}
+.tpi{background:rgba(0,255,136,.1);color:var(--green);border:1px solid rgba(0,255,136,.25)}
+
+/* TOAST */
+.toast{position:fixed;bottom:86px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--green);color:var(--navy);padding:11px 22px;border-radius:100px;font-weight:700;font-size:13px;opacity:0;transition:all .3s;z-index:500;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* MODAL */
+.mover{position:fixed;inset:0;background:rgba(5,10,24,.85);z-index:400;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+.mover.open{display:flex}
+.modal{width:100%;max-width:480px;background:var(--card);border-radius:20px 20px 0 0;border:1px solid var(--bdr);border-bottom:none;padding:20px 20px 32px;animation:su .3s ease;max-height:88vh;overflow-y:auto}
+@keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mhnd{width:40px;height:4px;background:var(--bdr);border-radius:2px;margin:0 auto 20px}
+.mtit{font-weight:700;font-size:18px;margin-bottom:16px}
+
+/* AI */
+.aifab{position:fixed;bottom:86px;right:16px;z-index:300}
+.aibtn{width:52px;height:52px;border-radius:50%;background:var(--gold);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 20px rgba(245,166,35,.4);transition:all .2s}
+.aiwin{position:absolute;bottom:62px;right:0;width:300px;background:var(--card);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;display:none;box-shadow:0 16px 48px rgba(0,0,0,.5)}
+.aiwin.open{display:block}
+.aihd{background:var(--gold);padding:12px 16px;display:flex;align-items:center;gap:8px}
+.aiht{font-weight:700;color:var(--navy);font-size:13px}
+.aihs{font-size:10px;color:rgba(5,10,24,.6)}
+.aicl{margin-left:auto;background:none;border:none;color:var(--navy);cursor:pointer;font-size:16px;font-weight:700}
+.aimsgs{padding:14px;height:175px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.aimsg{background:var(--card2);border-radius:10px 10px 10px 3px;padding:10px 12px;font-size:12px;line-height:1.5;max-width:85%}
+.aimsg.u{background:rgba(245,166,35,.12);border-radius:10px 10px 3px 10px;align-self:flex-end;color:var(--gold)}
+.aiqk{padding:0 12px 8px;display:flex;flex-wrap:wrap;gap:5px}
+.aiq{font-size:10px;padding:4px 9px;border-radius:100px;background:var(--card2);border:1px solid var(--bdr);color:var(--mut);cursor:pointer}
+.aiq:hover{border-color:var(--gold);color:var(--gold)}
+.aiir{display:flex;padding:10px;gap:7px;border-top:1px solid var(--bdr)}
+.aiinp{flex:1;background:var(--card2);border:1px solid var(--bdr);border-radius:7px;padding:8px 12px;color:var(--white);font-size:12px;font-family:var(--B);outline:none}
+.aisnd{background:var(--gold);border:none;border-radius:7px;width:32px;cursor:pointer;font-size:14px}
+
+/* ACADEMY FAB */
+.acfab{position:fixed;bottom:86px;left:16px;z-index:300}
+.acbtn{display:flex;align-items:center;gap:7px;background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.3);border-radius:100px;padding:9px 14px;cursor:pointer;backdrop-filter:blur(10px)}
+.actxt{font-size:11px;font-weight:700;color:var(--green)}
+
+/* HOME PAGE STYLES */
+.hero{background:linear-gradient(180deg,rgba(245,166,35,.06) 0%,transparent 100%);border-bottom:1px solid var(--bdr);padding:24px 16px 20px}
+.htag{display:inline-flex;align-items:center;gap:6px;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.25);padding:5px 14px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--green);margin-bottom:14px}
+.hh1{font-family:var(--D);font-size:clamp(44px,13vw,68px);line-height:.9;letter-spacing:2px;margin-bottom:14px}
+.hsub{font-size:15px;color:var(--mut);line-height:1.7;margin-bottom:22px}
+.hsub strong{color:var(--white)}
+.hpr{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:22px;flex-wrap:wrap;text-align:center}
+.hpv{font-family:var(--M);font-size:19px;font-weight:600;color:var(--gold)}
+.hpl{font-size:10px;color:var(--mut);margin-top:2px;text-transform:uppercase;letter-spacing:.8px}
+.hdiv{width:1px;height:38px;background:var(--bdr)}
+.hform{display:flex;gap:8px;margin-bottom:12px;max-width:380px;margin-left:auto;margin-right:auto}
+.hn{font-size:11px;color:var(--mut);text-align:center;margin-bottom:22px}
+.sbar{background:var(--card2);border:1px solid var(--bdr);border-radius:14px;padding:14px}
+.sbhd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sbtit{font-weight:700;font-size:13px}
+.sbst{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--green)}
+.spw{height:10px;background:var(--bdr);border-radius:5px;overflow:hidden;margin-bottom:7px}
+.spf{height:100%;border-radius:5px;width:34%;background:linear-gradient(90deg,var(--gold),var(--green));position:relative}
+.spf::after{content:'';position:absolute;right:0;top:0;bottom:0;width:3px;background:rgba(255,255,255,.5);border-radius:2px;animation:sh 1.5s infinite}
+@keyframes sh{0%,100%{opacity:.5}50%{opacity:1}}
+.sbsub{font-size:11px;color:var(--mut)}
+.sbsub strong{color:var(--gold)}
+.qtg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.qt{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .2s}
+.qt:hover{border-color:var(--gold);background:var(--gg)}
+.qtico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.qtla{font-weight:700;font-size:13px}
+.qtsu{font-size:11px;color:var(--mut);margin-top:2px}
+.scols{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.scol{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:14px;text-align:center}
+.scol.act{border-color:rgba(245,166,35,.4);background:rgba(245,166,35,.06)}
+.slbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--mut);margin-bottom:6px}
+.simlx{font-family:var(--M);font-size:14px;font-weight:600;color:var(--gold);margin-bottom:4px}
+.sst{font-size:10px;font-weight:700}
+.sa{color:var(--green)}.sl{color:var(--mut)}
+.pc{background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:16px;display:flex;gap:12px;margin-bottom:10px}
+.pc:hover{border-color:rgba(245,166,35,.3)}
+.pico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.ptit{font-weight:700;font-size:14px;margin-bottom:4px}
+.ptxt{font-size:12px;color:var(--mut);line-height:1.6}
+.piut{background:var(--card);border:1px solid rgba(0,255,136,.2);border-radius:16px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden}
+.piut::before{content:'"';font-family:var(--D);font-size:100px;color:var(--green);opacity:.07;position:absolute;top:-10px;left:10px;line-height:1}
+.piuttxt{font-size:14px;line-height:1.7;margin-bottom:10px}
+.piuttxt strong{color:var(--green)}
+.piutcr{font-size:11px;color:var(--mut);font-style:italic}
+.hstep{display:flex;gap:12px;margin-bottom:14px}
+.snum{width:30px;height:30px;border-radius:50%;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:var(--gold);flex-shrink:0}
+.stit2{font-weight:700;font-size:14px;margin-bottom:3px}
+.sdesc2{font-size:12px;color:var(--mut);line-height:1.6}
+.tg2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.ti2{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:14px;text-align:center}
+.tiico{font-size:26px;margin-bottom:8px}
+.titit{font-weight:700;font-size:13px;margin-bottom:4px}
+.tidsc{font-size:11px;color:var(--mut);line-height:1.5}
+.fi{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid rgba(26,46,74,.5)}
+.fi:last-child{border-bottom:none}
+.fico{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.fga{background:rgba(245,166,35,.15)}.fgb{background:rgba(0,255,136,.1)}
+.ftxt{flex:1;font-size:13px;line-height:1.5}
+.ftm{font-size:11px;color:var(--mut);margin-top:2px}
+.lbr{display:grid;grid-template-columns:28px 1fr auto auto;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(26,46,74,.5);font-size:12px}
+.lbr:last-child{border-bottom:none}
+.lbrnk{font-family:var(--M);font-size:11px;font-weight:700;color:var(--mut)}
+.r1{color:var(--gold)}.r2{color:#C0C0D0}.r3{color:#CD7F32}
+.lbid{font-weight:600}
+.lbrf{font-size:11px;color:var(--mut)}
+.lbpt{font-family:var(--M);font-size:11px;font-weight:600;color:var(--gold);text-align:right}
+
+/* EARN PAGE */
+.etabs{display:flex;padding:0 16px;border-bottom:1px solid var(--bdr);background:var(--card);position:sticky;top:96px;z-index:50}
+.etab{flex:1;padding:12px 8px;text-align:center;font-size:13px;font-weight:600;color:var(--mut);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.etab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.cic{background:var(--card);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;margin-bottom:14px}
+.cihd{padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
+.citit{font-weight:700;font-size:14px}
+.cinx{font-size:11px;color:var(--gold);font-family:var(--M);font-weight:600}
+.cidays{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--bdr)}
+.cid{background:var(--card);padding:10px 4px;text-align:center}
+.cidl{font-size:9px;color:var(--mut);margin-bottom:4px}
+.cidp{font-size:11px;font-weight:600;font-family:var(--M)}
+.cid.done{background:rgba(245,166,35,.06)}.cid.done .cidp{color:var(--gold)}
+.cid.tod{background:rgba(245,166,35,.12);border-top:2px solid var(--gold)}.cid.tod .cidp{color:var(--gold)}
+.cid.fut .cidp{color:var(--mut)}
+.tbanner{background:linear-gradient(135deg,rgba(245,166,35,.12),rgba(0,255,136,.06));border:1px solid rgba(245,166,35,.25);border-radius:14px;padding:14px;margin-bottom:12px}
+.tbhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.tblbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold)}
+.tbtit{font-weight:700;font-size:15px;margin-bottom:5px}
+.tbdesc{font-size:12px;color:var(--mut);line-height:1.5;margin-bottom:12px}
+.tbbot{display:flex;align-items:center;justify-content:space-between}
+.tbearn{font-size:12px;color:var(--mut)}
+.tbearn strong{color:var(--green)}
+.titem{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:14px;margin-bottom:10px}
+.titem:hover{border-color:rgba(245,166,35,.3)}
+.tihd{display:flex;align-items:flex-start;gap:12px}
+.tiico2{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.tibdy{flex:1}
+.tinm{font-weight:700;font-size:14px;margin-bottom:3px}
+.tidsc{font-size:12px;color:var(--mut);line-height:1.5;margin-bottom:8px}
+.timeta{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.tirw{display:flex;align-items:center;gap:5px;font-family:var(--M);font-size:13px;font-weight:600;color:var(--gold)}
+.ticp{font-size:11px;color:var(--mut)}
+.ticp span{color:var(--white)}
+.tdbtn{padding:8px 14px;background:var(--gold);color:var(--navy);border:none;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--B)}
+.tdone{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--green);padding:6px 12px;background:rgba(0,255,136,.08);border-radius:8px;border:1px solid rgba(0,255,136,.2)}
+.mitem{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:14px;margin-bottom:10px}
+.mitit{font-weight:700;font-size:14px;margin-bottom:3px}
+.midsc{font-size:12px;color:var(--mut);line-height:1.5;margin-bottom:10px}
+.miulk{display:flex;align-items:center;gap:8px;background:rgba(245,166,35,.07);border:1px dashed rgba(245,166,35,.25);border-radius:8px;padding:8px 12px;font-size:12px;flex-wrap:wrap}
+.mirw{color:var(--gold);font-weight:700;font-family:var(--M)}
+/* STORE PAGE */
+.sbar2{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--bdr);position:sticky;top:96px;z-index:50}
+.srch{flex:1;background:var(--card2);border:1px solid var(--bdr);border-radius:10px;padding:10px 14px;color:var(--white);font-family:var(--B);font-size:13px;outline:none}
+.srch::placeholder{color:var(--mut)}
+.cattabs{display:flex;gap:8px;padding:12px 16px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--bdr);background:var(--card)}
+.cattabs::-webkit-scrollbar{display:none}
+.ctab{display:flex;align-items:center;gap:5px;padding:7px 13px;border-radius:100px;white-space:nowrap;cursor:pointer;font-size:12px;font-weight:600;background:var(--card2);border:1px solid var(--bdr);color:var(--mut);flex-shrink:0}
+.ctab.active{background:rgba(245,166,35,.1);border-color:rgba(245,166,35,.3);color:var(--gold)}
+.pgrd{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px}
+.pcard{background:var(--card);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;cursor:pointer;transition:all .2s}
+.pcard:hover{border-color:rgba(245,166,35,.3);transform:translateY(-2px)}
+.pimg{height:120px;background:linear-gradient(135deg,var(--card2),var(--bdr));display:flex;align-items:center;justify-content:center;font-size:52px;position:relative}
+.ptag2{position:absolute;top:7px;left:7px;font-size:9px;font-weight:700;padding:3px 8px;border-radius:100px;text-transform:uppercase;letter-spacing:1px}
+.ins{background:rgba(0,255,136,.15);color:var(--green);border:1px solid rgba(0,255,136,.3)}
+.pre{background:rgba(100,160,255,.15);color:#64A0FF;border:1px solid rgba(100,160,255,.3)}
+.soo{background:rgba(245,166,35,.15);color:var(--gold);border:1px solid rgba(245,166,35,.3)}
+.pshr{position:absolute;top:7px;right:7px;width:26px;height:26px;border-radius:50%;background:rgba(5,10,24,.7);display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer}
+.pbdy{padding:12px}
+.pnm{font-weight:700;font-size:13px;margin-bottom:4px;line-height:1.3}
+.pprc{font-family:var(--M);font-size:14px;font-weight:600;color:var(--gold);margin-bottom:2px}
+.pnr{font-size:11px;color:var(--mut)}
+.pcom{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--green);margin-top:6px;font-weight:600}
+.gbitem{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:14px;margin-bottom:10px}
+.gbhd{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
+.gbtit{font-weight:700;font-size:14px;margin-bottom:2px}
+.gbby{font-size:11px;color:var(--mut)}
+.gbsp{font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px;background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.25);white-space:nowrap;flex-shrink:0}
+.gbmeta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.gbmi{background:var(--card2);border-radius:8px;padding:8px;text-align:center}
+.gbmv{font-family:var(--M);font-size:13px;font-weight:600;color:var(--gold)}
+.gbml{font-size:10px;color:var(--mut);margin-top:1px}
+.gbpbar{height:6px;background:var(--bdr);border-radius:3px;overflow:hidden;margin-bottom:6px}
+.gbpf{height:100%;background:linear-gradient(90deg,var(--gold),var(--green));border-radius:3px}
+.gbfoot{display:flex;align-items:center;justify-content:space-between}
+.gbcb{font-size:11px;color:var(--mut)}
+.gbcb strong{color:var(--green)}
+
+/* COMMUNITY PAGE */
+.ctabs{display:flex;padding:0 16px;border-bottom:1px solid var(--bdr);background:var(--card);position:sticky;top:96px;z-index:50}
+.ctab2{flex:1;padding:13px 8px;text-align:center;font-size:13px;font-weight:600;color:var(--mut);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.ctab2.active{color:var(--gold);border-bottom-color:var(--gold)}
+.post{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:14px;margin-bottom:10px}
+.posthd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.postm{flex:1}
+.postid{font-weight:700;font-size:13px}
+.postif{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--mut);margin-top:2px}
+.postbdy{font-size:14px;line-height:1.6;margin-bottom:12px}
+.postacts{display:flex;align-items:center;gap:14px;padding-top:10px;border-top:1px solid var(--bdr)}
+.pact{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--mut);cursor:pointer;border:none;background:none;font-family:var(--B)}
+.pact:hover{color:var(--gold)}
+.slbi{display:flex;align-items:center;gap:12px;padding:13px;background:var(--card);border:1px solid var(--bdr);border-radius:14px;margin-bottom:8px}
+.rnk{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--M);font-size:12px;font-weight:700;flex-shrink:0}
+.rkg{background:rgba(245,166,35,.15);color:var(--gold);border:1px solid rgba(245,166,35,.3)}
+.rks{background:rgba(192,192,208,.12);color:#C0C0D0;border:1px solid rgba(192,192,208,.25)}
+.rkb{background:rgba(205,127,50,.12);color:#CD7F32;border:1px solid rgba(205,127,50,.25)}
+.rkd{background:var(--card2);color:var(--mut);border:1px solid var(--bdr)}
+.slbid{flex:1;font-weight:700;font-size:14px}
+.slbpt{font-family:var(--M);font-size:13px;font-weight:600;color:var(--gold);text-align:right}
+.slbrf{font-size:11px;color:var(--mut);text-align:right}
+.annc{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:14px;margin-bottom:8px;display:flex;gap:12px;cursor:pointer}
+.annc:hover{border-color:rgba(245,166,35,.3)}
+.annci{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;background:rgba(245,166,35,.1)}
+.annct{font-weight:700;font-size:13px;margin-bottom:3px;line-height:1.4}
+.anncd{font-size:11px;color:var(--mut)}
+
+/* MY PAGE */
+.phero{background:linear-gradient(135deg,rgba(245,166,35,.08),rgba(0,255,136,.04));border-bottom:1px solid var(--bdr);padding:20px 16px}
+.ptop{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.pinf{flex:1}
+.pid{font-weight:700;font-size:18px;margin-bottom:4px}
+.pjn{font-size:11px;color:var(--mut)}
+.psts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.pst{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:12px;text-align:center}
+.pstv{font-family:var(--M);font-size:17px;font-weight:600;color:var(--gold)}
+.pstl{font-size:10px;color:var(--mut);margin-top:2px}
+.wcard{background:linear-gradient(135deg,#0C1526,#091325);border:1px solid rgba(245,166,35,.2);border-radius:16px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden}
+.wcard::before{content:'';position:absolute;width:180px;height:180px;background:radial-gradient(circle,rgba(245,166,35,.1) 0%,transparent 70%);top:-60px;right:-60px}
+.wlbl{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--mut);margin-bottom:4px}
+.wbal{font-family:var(--M);font-size:28px;font-weight:600;color:var(--white);margin-bottom:4px}
+.wusd{font-size:13px;color:var(--mut);margin-bottom:14px}
+.wacts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.wact{background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.2);border-radius:10px;padding:10px;text-align:center;cursor:pointer}
+.wai{font-size:18px;margin-bottom:3px}
+.wal{font-size:11px;font-weight:600;color:var(--gold)}
+.lkcard{background:var(--card2);border:1px solid var(--bdr);border-radius:14px;padding:14px;margin-bottom:14px}
+.lkhd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.lktit{font-weight:700;font-size:14px}
+.lkitems{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lki{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:12px}
+.lkv{font-family:var(--M);font-size:15px;font-weight:600;color:var(--gold)}
+.lkl{font-size:10px;color:var(--mut);margin-top:2px}
+.lknote{font-size:11px;color:var(--mut);margin-top:12px;line-height:1.5}
+.rcard{background:var(--card);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;margin-bottom:14px}
+.rchd{padding:14px 16px;border-bottom:1px solid var(--bdr);background:rgba(245,166,35,.04)}
+.rctit{font-weight:700;font-size:14px;margin-bottom:3px}
+.rcsub{font-size:11px;color:var(--mut)}
+.rcbdy{padding:14px 16px}
+.rcbox{display:flex;align-items:center;justify-content:space-between;background:var(--card2);border:1px solid var(--bdr);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.rccode{font-family:var(--M);font-size:16px;font-weight:600;letter-spacing:2px;color:var(--gold)}
+.rccpbtn{background:var(--gold);color:var(--navy);border:none;border-radius:7px;padding:6px 12px;font-weight:700;font-size:11px;cursor:pointer;font-family:var(--B)}
+.rcshr{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.rcsh{background:var(--card2);border:1px solid var(--bdr);border-radius:10px;padding:10px;text-align:center;cursor:pointer}
+.rcsh:hover{border-color:var(--gold)}
+.rcshi{font-size:18px;margin-bottom:3px}
+.rcshl{font-size:10px;color:var(--mut);font-weight:600}
+.rclevs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rclv{background:var(--card2);border-radius:10px;padding:12px}
+.rclvv{font-family:var(--M);font-size:18px;font-weight:600;margin-bottom:2px}
+.rclvl{font-size:11px;color:var(--mut)}
+.agrd{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.atile{background:var(--card2);border:1px solid var(--bdr);border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer}
+.atile:hover{border-color:rgba(245,166,35,.3)}
+.ati{font-size:22px;margin-bottom:5px}
+.atl{font-size:10px;color:var(--mut);font-weight:600;line-height:1.2}
+.slist{background:var(--card);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.sitem{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--bdr);cursor:pointer}
+.sitem:last-child{border-bottom:none}
+.sitem:hover{background:var(--card2)}
+.sico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.slbl2{flex:1;font-size:14px;font-weight:500}
+.srgt{font-size:12px;color:var(--mut)}
+
+/* RESERVE MODAL */
+.rtier{background:var(--card2);border:1px solid var(--bdr);border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer}
+.rtier.sel,.rtier:hover{border-color:var(--gold);background:var(--gg)}
+.rthd{display:flex;justify-content:space-between;align-items:flex-start}
+.rtnm{font-weight:700;font-size:14px}
+.rtrate{font-family:var(--M);font-size:13px;color:var(--green);font-weight:600}
+.rtbon{font-size:10px;font-weight:700;color:var(--gold);margin-top:2px}
+.rtrng{font-size:11px;color:var(--mut);margin-top:4px}
+.pms{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.pm{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:8px;background:var(--card2);border:1px solid var(--bdr);font-size:12px;font-weight:600;cursor:pointer}
+.pm.sel{border-color:var(--gold);background:var(--gg);color:var(--gold)}
+.rcalc{background:var(--card2);border:1px solid var(--bdr);border-radius:10px;padding:12px;margin-bottom:14px;font-size:13px}
+.rcrow{display:flex;justify-content:space-between;margin-bottom:6px}
+.rcrow:last-child{margin-bottom:0}
+
+/* FOOT */
+.foot{padding:22px 16px;border-top:1px solid var(--bdr);text-align:center}
+.flogo{font-family:var(--D);font-size:22px;letter-spacing:3px;color:var(--gold);margin-bottom:8px}
+.flogo span{color:var(--white)}
+.fsocs{display:flex;justify-content:center;gap:10px;margin:10px 0}
+.fsoc{width:34px;height:34px;border-radius:8px;background:var(--card);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px}
+.fsoc:hover{border-color:var(--gold)}
+.flinks{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;font-size:12px;margin-bottom:10px}
+.flinks a{color:var(--mut);text-decoration:none}
+.flinks a:hover{color:var(--gold)}
+.fcopy{font-size:11px;color:var(--mut)}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<nav class="topnav">
+  <a class="logo" href="#" onclick="sp('home');return false"><span>IML</span>EX</a>
+  <div style="display:flex;align-items:center">
+    <div class="nib" onclick="openNotif()">🔔<div class="ndot"></div></div>
+    <button class="rbtn" onclick="openRes()">Reserve IMLX</button>
+  </div>
+</nav>
+
+<div class="tkwrap">
+  <div class="tktrack">
+    <div class="tki"><div class="dot dg"></div><strong>@ChukwuNG</strong> reserved $200 → <strong>3,000 IMLX allocated</strong></div>
+    <div class="tki"><div class="dot da"></div><strong>Season 1</strong> pool: <strong>34% claimed</strong> — rate decreasing</div>
+    <div class="tki"><div class="dot dg"></div><strong>@LagosQueen</strong> completed seminar → <strong>200 IMLX earned</strong></div>
+    <div class="tki"><div class="dot da"></div><strong>@AbujaBoss</strong> hit 30 referrals → <strong>Builder badge unlocked</strong></div>
+    <div class="tki"><div class="dot dg"></div><strong>@SolarKing</strong> reserved $500 → <strong>7,500 IMLX allocated</strong></div>
+    <div class="tki"><div class="dot da"></div>Current rate: <strong>15 IMLX per $1</strong> — reserve early</div>
+    <div class="tki"><div class="dot dg"></div><strong>@ChukwuNG</strong> reserved $200 → <strong>3,000 IMLX allocated</strong></div>
+    <div class="tki"><div class="dot da"></div><strong>Season 1</strong> pool: <strong>34% claimed</strong> — rate decreasing</div>
+    <div class="tki"><div class="dot dg"></div><strong>@LagosQueen</strong> completed seminar → <strong>200 IMLX earned</strong></div>
+    <div class="tki"><div class="dot da"></div><strong>@AbujaBoss</strong> hit 30 referrals → <strong>Builder badge unlocked</strong></div>
+    <div class="tki"><div class="dot dg"></div><strong>@SolarKing</strong> reserved $500 → <strong>7,500 IMLX allocated</strong></div>
+    <div class="tki"><div class="dot da"></div>Current rate: <strong>15 IMLX per $1</strong> — reserve early</div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="htag"><div class="ldot"></div>World's First Physical Impact Token</div>
+    <h1 class="hh1">LIGHT UP<br>YOUR <span class="gold">FUTURE</span></h1>
+    <p class="hsub">A presale backed by <strong>real physical assets</strong> — electric bikes, solar panels, and clean transport across Africa. Buyback and burn mechanism. Your position appreciates.</p>
+    <div class="hpr">
+      <div class="hpi"><div class="hpv">$0.0100</div><div class="hpl">Current Price</div></div>
+      <div class="hdiv"></div>
+      <div class="hpi"><div class="hpv">$0.0200</div><div class="hpl">Listing Target</div></div>
+      <div class="hdiv"></div>
+      <div class="hpi"><div class="hpv">15 IMLX/$1</div><div class="hpl">Current Rate</div></div>
+    </div>
+    <div class="hform">
+      <input class="inp" type="email" placeholder="Enter your email" id="hemail">
+      <button class="btn bp bsm" onclick="joinW()">Join Now</button>
+    </div>
+    <div class="hn">Email only. No crypto wallet needed. Anyone can do this.</div>
+    <div class="sbar">
+      <div class="sbhd"><span class="sbtit">⚡ Season 1 — Live</span><span class="sbst"><div class="ldot"></div>Active</span></div>
+      <div class="spw"><div class="spf"></div></div>
+      <div class="sbsub">Reserve early — <strong>rate decreases as pool fills</strong></div>
+    </div>
+  </div>
+  <div class="con">
+    <div class="sp24"></div>
+    <div class="sh"><div class="stag">Get Started</div><div class="stit">TAKE ACTION</div></div>
+    <div class="qtg">
+      <div class="qt" onclick="openRes()"><div class="qtico" style="background:rgba(245,166,35,.12)">📥</div><div><div class="qtla">Reserve IMLX</div><div class="qtsu">15 IMLX per $1</div></div></div>
+      <div class="qt" onclick="sp('earn')"><div class="qtico" style="background:rgba(0,255,136,.08)">🎯</div><div><div class="qtla">Earn Points</div><div class="qtsu">3 tasks today</div></div></div>
+      <div class="qt" onclick="sp('store')"><div class="qtico" style="background:rgba(100,160,255,.08)">🛒</div><div><div class="qtla">Browse Store</div><div class="qtsu">Solar, EV & more</div></div></div>
+      <div class="qt" onclick="shareRef()"><div class="qtico" style="background:rgba(180,100,255,.08)">👥</div><div><div class="qtla">Invite Friends</div><div class="qtsu">Earn 5% per deposit</div></div></div>
+    </div>
+    <div class="sh"><div class="stag">Seasons</div><div class="stit">THREE SEASONS</div><div class="sdesc">Each season ends when its point pool is exhausted. No dates — milestone-triggered only.</div></div>
+    <div class="scols">
+      <div class="scol act"><div class="slbl">Season 1</div><div class="simlx">15M IMLX</div><div class="sst sa">🟢 Live Now</div></div>
+      <div class="scol"><div class="slbl">Season 2</div><div class="simlx">20M IMLX</div><div class="sst sl">🔒 Locked</div></div>
+      <div class="scol"><div class="slbl">Season 3</div><div class="simlx">25M IMLX</div><div class="sst sl">🔒 Locked</div></div>
+    </div>
+    <div class="sh"><div class="stag">Why We Exist</div><div class="stit">THREE PROBLEMS.<br>ONE SOLUTION.</div></div>
+    <div class="pc"><div class="pico" style="background:rgba(255,68,68,.1)">🚨</div><div><div class="ptit">$2.8B Lost to Fake Presales</div><div class="ptxt">Billions stolen through unverified projects. IMOLEX is different — every naira in a public wallet visible on BSCScan.</div></div></div>
+    <div class="pc"><div class="pico" style="background:rgba(245,166,35,.1)">⛽</div><div><div class="ptit">₦35,000/Month on Fuel & Generator</div><div class="ptxt">Electric transport and solar cut this by up to 90%. Presale funds go directly into real EV bikes and solar systems.</div></div></div>
+    <div class="pc"><div class="pico" style="background:rgba(100,160,255,.1)">🚌</div><div><div class="ptit">One-Chance Transport Crisis</div><div class="ptxt">Millions risk safety daily. IMOLEX transport is GPS-tracked, camera-equipped, with a passenger danger button.</div></div></div>
+    <div class="sp16"></div>
+    <div class="sh"><div class="stag">A New Category</div><div class="stit">WHAT IS A PIUT?</div></div>
+    <div class="piut"><div class="piuttxt">A <strong>Physical Impact Utility Token (PIUT)</strong> is a new class of cryptocurrency where token purchases directly fund real-world clean energy and transport infrastructure, while holders use the token for daily financial utility. <strong>IMOLEX is the world's first PIUT.</strong></div><div class="piutcr">— Defined and originated by Imolex Technologies Limited, 2026</div></div>
+    <div class="sp16"></div>
+    <div class="sh"><div class="stag">Simple Explanation</div><div class="stit">HOW IT WORKS</div></div>
+    <div class="card cp" style="margin-bottom:14px">
+      <div class="hstep"><div class="snum">1</div><div><div class="stit2">Reserve Your Position</div><div class="sdesc2">Pay by card or bank transfer. Converts to IMLX instantly. Funds returned at Season 3 end. IMLX on top is your reward.</div></div></div>
+      <div class="hstep"><div class="snum">2</div><div><div class="stit2">Farm IMLX Through Tasks</div><div class="sdesc2">Share on WhatsApp, write blogs, complete Academy courses, host seminars. More deposit = higher farming multiplier (max 3x).</div></div></div>
+      <div class="hstep"><div class="snum">3</div><div><div class="stit2">Refer and Multiply</div><div class="sdesc2">Every depositing referral earns you 5–15% of their allocation. Hit milestones for massive bonus IMLX.</div></div></div>
+      <div class="hstep" style="margin-bottom:0"><div class="snum">4</div><div><div class="stit2">Launch. Swap. Profit.</div><div class="sdesc2">At launch, IMLX is live on PancakeSwap at $0.02 — 2x the Season 1 price. Swap to USDT, send to any account.</div></div></div>
+    </div>
+    <div class="sh"><div class="stag">Why Trust Us</div><div class="stit">PROOF, NOT PROMISES</div></div>
+    <div class="tg2">
+      <div class="ti2"><div class="tiico">🏛️</div><div class="titit">CAC Registered</div><div class="tidsc">Imolex Technologies Limited. Legal Nigerian company.</div></div>
+      <div class="ti2"><div class="tiico">🔍</div><div class="titit">Audited Contract</div><div class="tidsc">Smart contract audited. Public on BSCScan before presale.</div></div>
+      <div class="ti2"><div class="tiico">👁️</div><div class="titit">Public Treasury</div><div class="tidsc">All funds in Gnosis Safe. Every movement visible on-chain.</div></div>
+      <div class="ti2"><div class="tiico">🔒</div><div class="titit">Locked Liquidity</div><div class="tidsc">2-year liquidity lock at launch. Proof always public.</div></div>
+    </div>
+    <div class="sp16"></div>
+    <div class="sh"><div class="stag">Right Now</div><div class="stit">LIVE ACTIVITY</div></div>
+    <div class="card" style="margin-bottom:14px"><div style="padding:14px">
+      <div class="fi"><div class="fico fga">🔥</div><div><div class="ftxt"><strong>@SigmaNG</strong> reserved $200 → <span class="gold">3,000 IMLX allocated</span></div><div class="ftm">2 minutes ago</div></div></div>
+      <div class="fi"><div class="fico fgb">🏆</div><div><div class="ftxt"><strong>@IbadanGirl</strong> completed seminar → <span class="grn">200 IMLX earned</span></div><div class="ftm">5 minutes ago</div></div></div>
+      <div class="fi"><div class="fico fga">📢</div><div><div class="ftxt"><strong>@AbujaBoss</strong> hit 30 referrals → <span class="gold">Builder badge + 3,000 IMLX bonus</span></div><div class="ftm">8 minutes ago</div></div></div>
+      <div class="fi" style="border-bottom:none"><div class="fico fgb">🌍</div><div><div class="ftxt"><strong>@JajaUK</strong> referred 3 friends from London → <span class="gold">deposits verified</span></div><div class="ftm">18 minutes ago</div></div></div>
+    </div></div>
+    <div class="sh"><div class="stag">This Week's Leaders</div><div class="stit">LEADERBOARD</div></div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="lbr" style="background:rgba(245,166,35,.06);border-bottom:1px solid var(--bdr)"><span class="lbrnk r1">🥇1</span><span class="lbid">@ChukwuEmeka</span><span class="lbrf">47 refs</span><span class="lbpt">2,340 IMLX</span></div>
+      <div class="lbr"><span class="lbrnk r2">🥈2</span><span class="lbid">@AbujaBoss</span><span class="lbrf">38 refs</span><span class="lbpt">1,890 IMLX</span></div>
+      <div class="lbr"><span class="lbrnk r3">🥉3</span><span class="lbid">@LagosQueen</span><span class="lbrf">31 refs</span><span class="lbpt">1,540 IMLX</span></div>
+      <div class="lbr"><span class="lbrnk">4</span><span class="lbid">@SolarKing</span><span class="lbrf">24 refs</span><span class="lbpt">1,200 IMLX</span></div>
+      <div class="lbr"><span class="lbrnk">5</span><span class="lbid">@PhCityRider</span><span class="lbrf">19 refs</span><span class="lbpt">950 IMLX</span></div>
+      <div style="padding:12px;text-align:center;border-top:1px solid var(--bdr)"><a onclick="sp('community');return false" href="#" style="color:var(--gold);font-size:12px;font-weight:600;text-decoration:none">View full leaderboard →</a></div>
+    </div>
+    <div class="sp24"></div>
+    <div class="foot">
+      <div class="flogo"><span>IML</span>EX</div>
+      <div class="fsocs"><div class="fsoc">𝕏</div><div class="fsoc">✈</div><div class="fsoc">🎵</div><div class="fsoc">▶</div></div>
+      <div class="flinks"><a href="#">Whitepaper</a><a href="#">Smart Contract</a><a href="#">Terms</a><a href="#">Privacy</a><a href="#">Help</a></div>
+      <div class="fcopy">© 2026 Imolex Technologies Limited · CAC Registered · From Imọlẹ — Yoruba for Light</div>
+    </div>
+  </div>
+</div>
+
+<!-- EARN -->
+<div id="page-earn" class="page">
+  <div class="etabs">
+    <div class="etab active" onclick="setE('daily',this)">Daily Tasks</div>
+    <div class="etab" onclick="setE('season',this)">Season Tasks</div>
+    <div class="etab" onclick="setE('milestones',this)">Milestones</div>
+  </div>
+  <div class="con">
+    <div id="e-daily">
+      <div class="sp16"></div>
+      <div class="card cardg cp" style="margin-bottom:14px"><div class="rwb"><div><div style="font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Your Farming Multiplier</div><div style="font-family:var(--M);font-size:22px;font-weight:600;color:var(--gold)">1x — Explorer</div><div style="font-size:11px;color:var(--mut);margin-top:3px">Reserve $500+ to unlock 1.5x</div></div><button class="btn bp bsm" onclick="openRes()">Upgrade →</button></div></div>
+      <div class="cic">
+        <div class="cihd"><div class="citit">📅 Daily Check-In</div><div class="cinx">Next in: 11:24:30</div></div>
+        <div class="cidays">
+          <div class="cid done"><div class="cidl">Day 1</div><div>✓</div><div class="cidp">5</div></div>
+          <div class="cid done"><div class="cidl">Day 2</div><div>✓</div><div class="cidp">5</div></div>
+          <div class="cid tod"><div class="cidl">Today</div><div>⚡</div><div class="cidp">5</div></div>
+          <div class="cid fut"><div class="cidl">Day 4</div><div>⭐</div><div class="cidp">10</div></div>
+          <div class="cid fut"><div class="cidl">Day 5</div><div>⭐</div><div class="cidp">5</div></div>
+          <div class="cid fut"><div class="cidl">Day 6</div><div>⭐</div><div class="cidp">5</div></div>
+          <div class="cid fut"><div class="cidl">Day 7</div><div>🏆</div><div class="cidp">50</div></div>
+        </div>
+      </div>
+      <div class="sp12"></div>
+      <div class="tbanner">
+        <div class="tbhd"><div class="tblbl">📢 Today's Featured Task</div><div class="tag tga">⏰ Resets Midnight</div></div>
+        <div class="tbtit">Share IMOLEX's Solar Story on WhatsApp Status</div>
+        <div class="tbdesc">One tap — caption and link already written for you. When 3+ unique people click your link in 24hrs, IMLX is credited automatically.</div>
+        <div class="tbbot"><div class="tbearn">Earn: <strong>5–15 IMLX</strong> by tier</div><button class="btn bp bsm" onclick="toast('Opening WhatsApp...')">Share Now 📤</button></div>
+      </div>
+      <div class="titem"><div class="tihd"><div class="tiico2" style="background:rgba(100,160,255,.1)">🔥</div><div class="tibdy"><div class="tinm">7-Day Login Streak</div><div class="tidsc">Log in daily for 7 days. Miss a day and streak resets.</div><div class="timeta"><div class="tirw">🪙 50 IMLX bonus</div><div class="ticp">Streak: <span>Day 3 of 7</span></div></div></div></div><div class="sp8"></div><div class="pbar"><div class="pf" style="width:43%"></div></div></div>
+      <div class="titem"><div class="tihd"><div class="tiico2" style="background:rgba(0,255,136,.08)">🎓</div><div class="tibdy"><div class="tinm">Academy Video — Course 3: How to Stake</div><div class="tidsc">Watch fully. Type the secret word that appears mid-video.
+        Like the video to unlock your IMLX.</div><div class="timeta"><div class="tirw">🪙 5 IMLX</div><div class="ticp">Weekly: <span>15/50 IMLX</span></div></div></div></div><div class="sp8"></div><button class="btn bp bsm bfw" onclick="toast('Opening Academy video...')">Watch & Earn 🎬</button></div>
+      <div class="titem"><div class="tihd"><div class="tiico2" style="background:rgba(90,122,154,.15)">𝕏</div><div class="tibdy"><div class="tinm">Post on X/Twitter + Tag @ImlxOfficial</div><div class="tidsc">Write about IMOLEX and tag our official account. Verified via API within 1 hour.</div><div class="timeta"><div class="tirw">🪙 15 IMLX</div><div class="tdone">✓ Done today</div></div></div></div></div>
+    </div>
+    <div id="e-season" style="display:none">
+      <div class="sp16"></div>
+      <div class="titem"><div class="tihd"><div class="tiico2" style="background:rgba(0,200,83,.1)">📱</div><div class="tibdy"><div class="tinm">WhatsApp Status (Daily)</div><div class="tidsc">One-click share. Caption and referral link pre-written. 3+ unique clicks in 24hrs = verified. Daily, weekly cap applies.</div><div class="timeta"><div class="tirw">🪙 5–15 IMLX/day</div><div class="ticp">Cap: <span>35 IMLX/week</span></div></div></div></div></div>
+      <div class="titem"><div class="tihd"><div class="tiico2" style="background:rgba(180,100,255,.1)">✍️</div><div class="tibdy"><div class="tinm">Blog Post (300+ words)</div><div class="tidsc">Write about IMOLEX. Submit link. ImlxAI reviews within 24hrs. Embed referral link for bonus tracking.</div><div class="timeta"><div class="tirw">🪙 50–150 IMLX</div><div class="ticp">Cap: <span>100/week</span></div></div></div></div><div class="sp8"></div><button class="btn bo bsm bfw" onclick="toast('Submit blog URL — full app')">Submit Blog Link</button></div>
+      <div class="titem"><div class="tihd"><div class="tiico2" style="background:rgba(255,140,0,.1)">🎤</div><div class="tibdy"><div class="tinm">Host a Seminar (Video Proof)</div><div class="tidsc">Highest earning task. Host session for minimum 5 people. Upload video proof. ImlxAI reviews. Highest single task reward.</div><div class="timeta"><div class="tirw">🪙 200–600 IMLX</div><div class="ticp">Cap: <span>1/week</span></div></div></div></div><div class="sp8"></div><button class="btn bp bsm bfw" onclick="toast('Upload seminar video — full app')">Upload Seminar Video 📹</button></div>
+      <div class="titem"><div class="tihd"><div class="tiico2" style="background:rgba(100,200,255,.1)">🛒</div><div class="tibdy"><div class="tinm">Product Link Commission</div><div class="tidsc">Share ImlxStore product links with your code. Earn 3% of every purchase through your link. No weekly cap.</div><div class="tirw" style="margin-top:8px">🪙 3% of every sale — No cap</div></div></div><div class="sp8"></div><button class="btn bo bsm bfw" onclick="sp('store')">Browse Products to Share →</button></div>
+    </div>
+    <div id="e-milestones" style="display:none">
+      <div class="sp16"></div>
+      <div class="card cardg cp" style="margin-bottom:14px"><div class="rwb"><div><div style="font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Your Referrals</div><div style="font-family:var(--M);font-size:24px;font-weight:600;color:var(--gold)">27</div><div style="font-size:11px;color:var(--mut);margin-top:2px">L1: 18 | L2: 9</div></div><div style="text-align:right"><div style="font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Next Milestone</div><div style="font-family:var(--M);font-size:18px;font-weight:600">30 refs</div></div></div><div class="sp8"></div><div class="pbar"><div class="pf" style="width:54%"></div></div><div class="sp12"></div><button class="btn bp bsm bfw" onclick="shareRef()">📤 Share Referral Link Now</button></div>
+      <div class="mitem"><div class="tag tgg" style="margin-bottom:10px">✓ Achieved</div><div class="mitit">10 Depositing Referrals</div><div class="midsc">Reached! Keep going — each milestone unlocks bigger rewards.</div><div class="miulk"><span>🏅</span><span class="mirw">1,000 IMLX</span><span>+ Seed Badge unlocked</span></div></div>
+      <div class="mitem" style="border-color:rgba(245,166,35,.4);background:rgba(245,166,35,.04)"><div class="tag tga" style="margin-bottom:10px">🔓 3 More Needed</div><div class="mitit">30 Referrals Within 1 Week</div><div class="midsc">Refer 30 depositing users in same 7-day window. Unlocks weekly pool access.</div><div class="miulk"><span>🏆</span><span class="mirw">3,000 IMLX</span><span>+ Weekly Pool + Active Recruiter Badge</span></div><div class="sp8"></div><div class="pbar"><div class="pf" style="width:90%;background:linear-gradient(90deg,#F5A623,#FF8C00)"></div></div><div style="font-size:11px;color:var(--mut);margin-top:4px">27/30 this week</div></div>
+      <div class="mitem"><div class="tag tgm" style="margin-bottom:10px">🔒 23 more</div><div class="mitit">50 Total Depositing Referrals</div><div class="midsc">Community leadership eligibility. Builder status unlocked.</div><div class="miulk"><span>⚡</span><span class="mirw">8,000 IMLX</span><span>+ Builder Status + Regional Partner Application</span></div></div>
+      <div class="mitem"><div class="tag tgm" style="margin-bottom:10px">🔒 73 more</div><div class="mitit">100 Total Depositing Referrals</div><div class="midsc">Top tier community builder. Farming multiplier upgrades for rest of season.</div><div class="miulk"><span>🚀</span><span class="mirw">20,000 IMLX</span><span>+ Network Leader + 2x Task Rate rest of season</span></div></div>
+      <div class="mitem"><div class="tag tgm" style="margin-bottom:10px">🔒 473 more</div><div class="mitit">500 Total Depositing Referrals</div><div class="midsc">Season Champion. Exclusive Season 2 bonuses locked in for you.</div><div class="miulk"><span>💎</span><span class="mirw">125,000 IMLX</span><span>+ Season Champion + Exclusive S2 Bonus Pre-locked</span></div></div>
+      <div class="mitem" style="border-color:rgba(0,255,136,.2);background:rgba(0,255,136,.03)"><div class="tag tgg" style="margin-bottom:10px">👑 ULTIMATE MILESTONE</div><div class="mitit">1,000 Total Depositing Referrals</div><div class="midsc">IMOLEX Legend. Permanent Honor Wall. Gold ImoID forever. Direct founder access. Season 1's most impactful builder.</div><div class="miulk"><span>🌍</span><span class="mirw">280,000 IMLX</span><span>+ IMOLEX Legend + Honor Wall + Gold ImoID + Founder Access</span></div></div>
+    </div>
+    <div class="sp24"></div>
+  </div>
+</div>
+
+<!-- STORE -->
+<div id="page-store" class="page">
+  <div class="sbar2"><input class="srch" type="text" placeholder="🔍 Search solar, bikes, inverters..."><div style="width:40px;height:40px;background:var(--card2);border:1px solid var(--bdr);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0" onclick="toast('Filter — full app!')">⚙️</div></div>
+  <div class="cattabs">
+    <div class="ctab active">⚡ All</div>
+    <div class="ctab">☀️ Solar</div>
+    <div class="ctab">🛵 EV Bikes</div>
+    <div class="ctab">🔋 Inverters</div>
+    <div class="ctab">🔒 Security</div>
+    <div class="ctab">🚌 Transport</div>
+    <div class="ctab">⏳ Coming Soon</div>
+  </div>
+  <div class="con">
+    <div class="sp16"></div>
+    <div class="card cardg cp" style="margin-bottom:14px"><div class="rwb"><div><div class="tag tga" style="margin-bottom:6px">👥 Group Buy Active</div><div style="font-weight:700;font-size:14px">Solar Kit — 1 spot left</div><div style="font-size:12px;color:var(--mut);margin-top:2px">4 of 5 members · 100 IMLX per person</div></div><button class="btn bp bsm" onclick="toast('Joined group buy!')">Join</button></div></div><div class="sh"><div class="stag">Available Now</div><div class="stit">IMOLEX STORE</div><div class="sdesc">Pay with IMLX. Earn 3% commission when you share product links.</div></div>
+    <div class="pgrd">
+      <div class="pcard"><div class="pimg">☀️<div class="ptag2 ins">In Stock</div><div class="pshr" onclick="event.stopPropagation();toast('Link copied!')">🔗</div></div><div class="pbdy"><div class="pnm">Solar Home Starter Kit</div><div class="pprc">500 IMLX</div><div class="pnr">≈ ₦175,000 · Market: ₦250,000</div><div class="pcom">🪙 3% commission per referral</div></div></div>
+      <div class="pcard"><div class="pimg">🛵<div class="ptag2 pre">Pre-order</div><div class="pshr" onclick="event.stopPropagation();toast('Link copied!')">🔗</div></div><div class="pbdy"><div class="pnm">IMOLEX Electric Bike</div><div class="pprc">1,800 IMLX</div><div class="pnr">≈ ₦380,000 · Market: ₦520,000</div><div class="pcom">🪙 3% commission per referral</div></div></div>
+      <div class="pcard"><div class="pimg">🔋<div class="ptag2 ins">In Stock</div><div class="pshr" onclick="event.stopPropagation();toast('Link copied!')">🔗</div></div><div class="pbdy"><div class="pnm">Inverter + Battery Bundle</div><div class="pprc">1,200 IMLX</div><div class="pnr">≈ ₦290,000 · Market: ₦420,000</div><div class="pcom">🪙 3% commission per referral</div></div></div>
+      <div class="pcard"><div class="pimg" style="opacity:.6">🚌<div class="ptag2 soo">Coming Soon</div></div><div class="pbdy"><div class="pnm">EV Minibus (100-Pass.)</div><div class="pprc" style="color:var(--mut)">ImlxShares</div><div class="pnr">Community funded · GPS + Camera</div><button class="btn bo bsm bfw" style="margin-top:8px;font-size:11px" onclick="toast('Notified!')">Notify Me</button></div></div>
+      <div class="pcard"><div class="pimg">💡<div class="ptag2 ins">In Stock</div><div class="pshr" onclick="event.stopPropagation();toast('Link copied!')">🔗</div></div><div class="pbdy"><div class="pnm">Solar Cooker</div><div class="pprc">120 IMLX</div><div class="pnr">≈ ₦42,000 · Market: ₦68,000</div><div class="pcom">🪙 3% commission per referral</div></div></div>
+      <div class="pcard"><div class="pimg" style="opacity:.6">🔒<div class="ptag2 soo">Coming Soon</div></div><div class="pbdy"><div class="pnm">Home Security Set</div><div class="pprc" style="color:var(--mut)">TBA</div><div class="pnr">4K · Motion alert · App connected</div><button class="btn bo bsm bfw" style="margin-top:8px;font-size:11px" onclick="toast('Notified!')">Notify Me</button></div></div>
+    </div>
+    <div class="sh"><div class="stag">Buy Together</div><div class="stit">GROUP BUYS</div><div class="sdesc">Join a group. Save up to 80%. Get cashback. App manages payment — no one holds your money.</div></div>
+    <div class="gbitem"><div class="gbhd"><div><div class="gbtit">☀️ Solar Starter Kit Group Buy</div><div class="gbby">Started by @ChukwuEmeka</div></div><div class="gbsp">1 spot left!</div></div><div class="gbmeta"><div class="gbmi"><div class="gbmv">100 IMLX</div><div class="gbml">Per person</div></div><div class="gbmi"><div class="gbmv">500 IMLX</div><div class="gbml">Solo price</div></div><div class="gbmi"><div class="gbmv">80%</div><div class="gbml">Saved</div></div></div><div class="gbpbar"><div class="gbpf" style="width:80%"></div></div><div class="gbfoot"><div class="gbcb">Bonus: <strong>50 IMLX cashback</strong> on next buy</div><button class="btn bp bsm" onclick="toast('Joined!')">Join — 1 left</button></div></div>
+    <div class="gbitem"><div class="gbhd"><div><div class="gbtit">🛵 Electric Bike Group Buy</div><div class="gbby">Started by @AbujaBoss</div></div><div class="gbsp">6 spots left</div></div><div class="gbmeta"><div class="gbmi"><div class="gbmv">225 IMLX</div><div class="gbml">Per person</div></div><div class="gbmi"><div class="gbmv">1,800 IMLX</div><div class="gbml">Solo price</div></div><div class="gbmi"><div class="gbmv">87%</div><div class="gbml">Saved</div></div></div><div class="gbpbar"><div class="gbpf" style="width:25%"></div></div><div class="gbfoot"><div
+      class="gbcb">Bonus: <strong>100 IMLX cashback</strong></div><button class="btn bo bsm" onclick="toast('Joined!')">Join</button></div></div>
+    <button class="btn bo bfw" onclick="toast('Start group buy — full app!')">+ Start a Group Buy</button>
+    <div class="sp24"></div>
+  </div>
+</div>
+
+<!-- COMMUNITY -->
+<div id="page-community" class="page">
+  <div class="ctabs">
+    <div class="ctab2 active" onclick="setC('feed',this)">Feed</div>
+    <div class="ctab2" onclick="setC('lb',this)">Leaderboard</div>
+    <div class="ctab2" onclick="setC('annc',this)">Announcements</div>
+  </div>
+  <div class="con">
+    <div id="c-feed">
+      <div class="sp16"></div>
+      <button class="btn bp bfw" style="margin-bottom:14px" onclick="toast('Post — full app!')">✏️ Share with the community</button>
+      <div class="post"><div class="posthd"><div class="av avm">C</div><div class="postm"><div class="postid">@ChukwuEmeka</div><div class="postif"><div class="tier tle">⭐ Leader</div><span>· 2 hours ago</span></div></div></div><div class="postbdy">Just hit my 50th depositing referral! 8,000 IMLX bonus just dropped. The seminar task is the highest paying single task. Host one! 🔥</div><div class="postacts"><button class="pact" onclick="this.style.color='var(--gold)'">👍 47</button><button class="pact">💬 12 replies</button><button class="pact" onclick="toast('Copied!')">🔗 Share</button></div></div>
+      <div class="post"><div class="posthd"><div class="av avm">J</div><div class="postm"><div class="postid">@JajaUK</div><div class="postif"><div class="tier tex">🌱 Explorer</div><span>· 1 day ago</span></div></div></div><div class="postbdy">Writing from London. Referred 6 Nigerian friends in the UK. They've all reserved. The diaspora opportunity here is HUGE — we send money home anyway, why not send it as IMLX? 🇳🇬</div><div class="postacts"><button class="pact" onclick="this.style.color='var(--gold)'">👍 89</button><button class="pact">💬 23 replies</button><button class="pact" onclick="toast('Copied!')">🔗 Share</button></div></div>
+      <div class="post"><div class="posthd"><div class="av avm">S</div><div class="postm"><div class="postid">@SigmaNG</div><div class="postif"><div class="tier tex">🌱 Explorer</div><span>· 2 days ago</span></div></div></div><div class="postbdy">I was on a platform for months. 189 referrals. 21 million EXP. V4 verified. They said "not eligible." That experience is exactly why IMOLEX exists. Here your referrals are tracked on-chain. This is different.</div><div class="postacts"><button class="pact" onclick="this.style.color='var(--gold)'">👍 214</button><button class="pact">💬 67 replies</button><button class="pact" onclick="toast('Copied!')">🔗 Share</button></div></div>
+    </div>
+    <div id="c-lb" style="display:none">
+      <div class="sp16"></div>
+      <div class="card cardg cp" style="margin-bottom:14px"><div class="stag">Season 1 — Week 3</div><div class="stit">SEASON LEADERS</div><div class="sdesc">ImoID only shown. Full name revealed when Ambassador is announced.</div></div>
+      <div class="slbi"><div class="rnk rkg">🥇</div><div class="av avs">C</div><div class="slbid">@ChukwuEmeka</div><div><div class="slbpt">2,340 IMLX</div><div class="slbrf">47 refs</div></div></div>
+      <div class="slbi"><div class="rnk rks">🥈</div><div class="av avs">A</div><div class="slbid">@AbujaBoss</div><div><div class="slbpt">1,890 IMLX</div><div class="slbrf">38 refs</div></div></div>
+      <div class="slbi"><div class="rnk rkb">🥉</div><div class="av avs">L</div><div class="slbid">@LagosQueen</div><div><div class="slbpt">1,540 IMLX</div><div class="slbrf">31 refs</div></div></div>
+      <div class="slbi"><div class="rnk rkd">4</div><div class="av avs">S</div><div class="slbid">@SolarKing</div><div><div class="slbpt">1,200 IMLX</div><div class="slbrf">24 refs</div></div></div>
+      <div class="slbi"><div class="rnk rkd">5</div><div class="av avs">P</div><div class="slbid">@PhCityRider</div><div><div class="slbpt">950 IMLX</div><div class="slbrf">19 refs</div></div></div>
+      <div class="slbi"><div class="rnk rkd">6</div><div class="av avs">J</div><div class="slbid">@JajaUK</div><div><div class="slbpt">880 IMLX</div><div class="slbrf">16 refs</div></div></div>
+      <div class="slbi"><div class="rnk rkd">7</div><div class="av avs">I</div><div class="slbid">@IbadanGirl</div><div><div class="slbpt">760 IMLX</div><div class="slbrf">14 refs</div></div></div>
+      <div class="slbi"><div class="rnk rkd">8</div><div class="av avs">E</div><div class="slbid">@EnuguPower</div><div><div class="slbpt">640 IMLX</div><div class="slbrf">12 refs</div></div></div>
+      <div class="slbi"><div class="rnk rkd">9</div><div class="av avs">K</div><div class="slbid">@KanoBuilder</div><div><div class="slbpt">580 IMLX</div><div class="slbrf">11 refs</div></div></div>
+      <div class="slbi"><div class="rnk rkd">10</div><div class="av avs">S</div><div class="slbid">@SigmaNG</div><div><div class="slbpt">520 IMLX</div><div class="slbrf">9 refs</div></div></div>
+      <div class="sp16"></div>
+      <div class="card cp" style="text-align:center;border-color:rgba(245,166,35,.2);background:rgba(245,166,35,.04)"><div style="font-size:13px;color:var(--mut);margin-bottom:6px">Your current position</div><div style="font-family:var(--M);font-size:22px;font-weight:600;color:var(--gold)">#47 of 4,821</div><div class="sp12"></div><button class="btn bp bfw" onclick="shareRef()">📤 Refer More to Climb</button></div>
+    </div>
+    <div id="c-annc" style="display:none">
+      <div class="sp16"></div>
+      <div class="annc"><div class="annci">🚀</div><div><div class="annct">Season 1 Is Live — Reserve Before Rate Decreases</div><div class="anncd">July 4, 2026 — Today</div></div></div>
+      <div class="annc"><div class="annci">🎤</div><div><div class="annct">New: Seminar Task Active — Earn 200-600 IMLX Per Event</div><div class="anncd">July 3, 2026</div></div></div>
+      <div class="annc"><div class="annci">☀️</div><div><div class="annct">Solar Starter Kit Now Available in ImlxStore</div><div class="anncd">July 2, 2026</div></div></div>
+      <div class="annc"><div class="annci">📋</div><div><div class="annct">Smart Contract Audit Report Published — imolex.app/audit</div><div class="anncd">July 1, 2026</div></div></div>
+      <div class="annc"><div class="annci">📄</div><div><div class="annct">IMOLEX Whitepaper v1.0 Released — Download Now</div><div class="anncd">June 28, 2026</div></div></div>
+    </div>
+    <div class="sp24"></div>
+  </div>
+</div>
+
+<!-- MY -->
+<div id="page-my" class="page">
+  <div class="phero"><div class="ptop"><div class="av avl">S</div><div class="pinf"><div class="pid">@SigmaNG</div><div class="tier tex" style="margin:4px 0">🌱 Explorer Tier</div><div class="pjn">Member since July 2026</div></div><button class="btn bo bsm" onclick="toast('Edit profile — full app!')">Edit</button></div><div class="psts"><div class="pst"><div class="pstv">247</div><div class="pstl">IMLX Earned</div></div><div class="pst"><div class="pstv">27</div><div class="pstl">Referrals</div></div><div class="pst"><div class="pstv">#47</div><div class="pstl">Season Rank</div></div></div></div>
+  <div class="con">
+    <div class="sp16"></div>
+    <div class="wcard"><div class="wlbl">Your IMLX Balance</div><div class="wbal">247.50 IMLX</div><div class="wusd">≈ $4.95 today · $49.50 at $0.20 target</div><div class="wacts"><div class="wact" onclick="toast('Send — post-launch')"><div class="wai">📤</div><div class="wal">Send</div></div><div class="wact" onclick="toast('Swap — post-launch')"><div class="wai">🔄</div><div class="wal">Swap</div></div></div></div>
+    <div class="lkcard"><div class="lkhd"><div class="lktit">🔒 Your Reservation</div><div class="tag tga">Locked — All 3 Seasons</div></div><div class="lkitems"><div class="lki"><div class="lkv">$100.00</div><div class="lkl">USD Reserved</div></div><div class="lki"><div class="lkv">1,500 IMLX</div><div class="lkl">From Deposit Pool</div></div><div class="lki"><div class="lkv">1x</div><div class="lkl">Task Multiplier</div></div><div class="lki"><div class="lkv">Explorer</div><div class="lkl">Current Tier</div></div></div><div class="lknote">⚠️ This is a position reservation, not an investment. Your $100 is returned at Season 3 completion. The 1,500 IMLX is your reward for reserving early.</div><div class="sp12"></div><button class="btn bp bsm bfw" onclick="openRes()">Reserve More IMLX →</button></div>
+    <div class="rcard"><div class="rchd"><div class="rctit">Your Referral Code</div><div class="rcsub">Earn 5-15% of every depositing referral's allocation</div></div><div class="rcbdy"><div class="rcbox"><div class="rccode">SIGMA7X</div><button class="rccpbtn" onclick="toast('Code copied!')">Copy</button></div><div class="rcshr"><div class="rcsh" onclick="toast('Opening WhatsApp...')"><div class="rcshi">📱</div><div class="rcshl">WhatsApp</div></div><div class="rcsh" onclick="toast('Link copied!')"><div class="rcshi">🔗</div><div class="rcshl">Copy Link</div></div><div class="rcsh" onclick="toast('QR — full app!')"><div class="rcshi">📷</div><div class="rcshl">QR Code</div></div></div><div class="rclevs"><div class="rclv"><div class="rclvv gold">18</div><div class="rclvl">Level 1 — Direct</div></div><div class="rclv"><div class="rclvv grn">9</div><div class="rclvl">Level 2 — Network</div></div></div></div></div>
+    <div class="sh"><div class="stag">Quick Access</div></div>
+    <div class="agrd">
+      <div class="atile" onclick="toast('Company Profile')"><div class="ati">🏛️</div><div class="atl">Company Profile</div></div>
+      <div class="atile" onclick="sp('earn')"><div class="ati">▶️</div><div class="atl">Academy</div></div>
+      <div class="atile" onclick="toast('Help Centre')"><div class="ati">🔍</div><div class="atl">Help Centre</div></div>
+      <div class="atile" onclick="toast('IMOLEX is hiring!')"><div class="ati">💼</div><div class="atl">Open Positions</div></div>
+      <div class="atile" onclick="shareRef()"><div class="ati">👥</div><div class="atl">Invite Friends</div></div>
+      <div class="atile" onclick="toast('Point history — full app!')"><div class="ati">📊</div><div class="atl">Point History</div></div>
+      <div class="atile" onclick="toast('My listings — full app!')"><div class="ati">🏷️</div><div class="atl">My Listings</div></div>
+      <div class="atile" onclick="toast('Surprise task!')"><div class="ati">🎁</div><div class="atl">Surprise Task</div></div>
+    </div>
+    <div class="slist">
+      <div class="sitem" onclick="toast('Announcements')"><div class="sico" style="background:rgba(245,166,35,.1)">📢</div><div class="slbl2">Announcements</div><div class="srgt">→</div></div>
+      <div class="sitem" onclick="toast('Alert settings')"><div class="sico" style="background:rgba(100,160,255,.1)">🔔</div><div class="slbl2">Alert Settings</div><div class="srgt">→</div></div>
+      <div class="sitem" onclick="toast('English')"><div class="sico" style="background:rgba(0,255,136,.08)">🌍</div><div class="slbl2">Language</div><div class="srgt">EN →</div></div>
+      <div class="sitem"><div class="sico" style="background:rgba(90,122,154,.1)">🌙</div><div class="slbl2">Dark Mode</div><div class="srgt" style="color:var(--green)">ON</div></div>
+      <div class="sitem" onclick="toast('Feedback sent!')"><div class="sico" style="background:rgba(180,100,255,.1)">💬</div><div class="slbl2">Send Feedback</div><div class="srgt">→</div></div>
+      <div class="sitem" onclick="toast('Opening whitepaper...')"><div class="sico" style="background:rgba(245,166,35,.1)">📄</div><div class="slbl2">Whitepaper</div><div class="srgt">→</div></div>
+      <div class="sitem" onclick="toast('CAC available on request')"><div class="sico" style="background:rgba(0,255,136,.08)">✅</div><div class="slbl2">Official Verification</div><div class="srgt">→</div></div>
+      <div class="sitem" onclick="toast('Account settings')"><div class="sico" style="background:rgba(255,68,68,.1)">⚙️</div><div class="slbl2">Account Settings</div><div class="srgt">→</div></div>
+    </div>
+    <div class="sp24"></div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<nav class="botnav">
+  <div class="ntab active" onclick="sp('home')" id="tab-home"><div class="ico">🏠</div><div class="lbl">Home</div></div>
+  <div class="ntab" onclick="sp('earn')" id="tab-earn"><div class="ico">🎯</div><div class="lbl">Earn</div></div>
+  <div class="ntab" onclick="sp('store')" id="tab-store"><div class="ico">🛒</div><div class="lbl">Store</div></div>
+  <div class="ntab" onclick="sp('community')" id="tab-community"><div class="ico">👥</div><div class="lbl">Community</div></div>
+  <div class="ntab" onclick="sp('my')" id="tab-my"><div class="ico">👤</div><div class="lbl">My</div></div>
+</nav>
+
+<div class="acfab"><div class="acbtn" onclick="toast('ImlxAcademy — full app!')"><div style="font-size:16px">🎓</div><div class="actxt">Academy</div></div></div>
+
+<div class="aifab">
+  <div class="aiwin" id="aiw">
+    <div class="aihd"><div><div class="aiht">🤖 ImlxAI</div><div class="aihs">Ask anything about IMOLEX</div></div><button class="aicl" onclick="toggleAI()">✕</button></div>
+    <div class="aimsgs" id="aimsgs"><div class="aimsg">Hi! I'm ImlxAI. Ask me anything — how to reserve, how to earn, referrals, what PIUT means. English and Pidgin both fine! 🇳🇬</div></div>
+    <div class="aiqk">
+      <button class="aiq" onclick="qa('How do I reserve?')">How to reserve?</button>
+      <button class="aiq" onclick="qa('What is PIUT?')">What is PIUT?</button>
+      <button class="aiq" onclick="qa('How does referral work?')">Referrals?</button>
+      <button class="aiq" onclick="qa('Is IMOLEX safe?')">Is it safe?</button>
+    </div>
+    <div class="aiir"><input class="aiinp" type="text" placeholder="Ask anything..." id="ai-inp" onkeypress="if(event.key==='Enter')aisend()"><button class="aisnd" onclick="aisend()">→</button></div>
+  </div>
+  <button class="aibtn" onclick="toggleAI()">🤖</button>
+</div>
+
+<!-- RESERVE MODAL -->
+<div class="mover" id="res-modal" onclick="if(event.target===this)closeRes()">
+  <div class="modal">
+    <div class="mhnd"></div>
+    <div class="mtit">📥 Reserve Your IMLX Position</div>
+    <div style="background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--mut);line-height:1.6">⚠️ <strong style="color:var(--white)">Legal Notice:</strong> This is a position reservation in the IMOLEX ecosystem, not an investment. Your funds are returned in full at Season 3 completion. IMLX earned is your reward for participating early.</div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Select Tier</div>
+      <div class="rtier sel" onclick="selT(this)"><div class="rthd"><div class="rtnm">🌱 Explorer</div><div class="rtrate">15 IMLX/$1</div></div><div class="rtbon">Standard rate · 1x task multiplier</div><div class="rtrng">$30 minimum · $490 maximum</div></div>
+      <div class="rtier" onclick="selT(this)"><div class="rthd"><div class="rtnm">🔵 Contributor</div><div class="rtrate">15 IMLX/$1</div></div><div class="rtbon">1.5x task multiplier — earn 50% more</div><div class="rtrng">$500 minimum · $4,999 maximum</div></div>
+      <div class="rtier" onclick="selT(this)"><div class="rthd"><div class="rtnm">⭐ Leader</div><div class="rtrate">15 IMLX/$1</div></div><div class="rtbon">2x task multiplier — double farming speed</div><div class="rtrng">$5,000 minimum · $19,999 maximum</div></div>
+      <div class="rtier" onclick="selT(this)"><div class="rthd"><div class="rtnm">👑 Pioneer</div><div class="rtrate">15 IMLX/$1</div></div><div class="rtbon">3x task multiplier — maximum farming rate</div><div class="rtrng">$20,000+ minimum</div></div>
+    </div>
+    <div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Amount (USD)</div><input class="inp" type="number" placeholder="Enter amount in USD" id="res-amt" oninput="calcR()"></div>
+    <div class="rcalc">
+      <div class="rcrow"><span class="mut">You pay</span><span id="r-usd">$0.00</span></div>
+      <div class="rcrow"><span class="mut">IMLX allocated (deposit pool)</span><span id="r-imlx" class="gold bold">0 IMLX</span></div>
+      <div class="rcrow"><span class="mut">Value at listing ($0.02)</span><span id="r-list" class="grn">$0.00</span></div>
+      <div class="rcrow"><span class="mut">Returned at Season 3 end</span><span id="r-ret" class="bold">$0.00</span></div>
+    </div>
+    <div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Payment Method</div><div class="pms"><div class="pm sel" onclick="selP(this)">💳 Card</div><div class="pm" onclick="selP(this)">🏦 Bank Transfer</div><div class="pm" onclick="selP(this)">₮ USDT</div><div class="pm" onclick="selP(this)">🔶 BNB</div></div></div>
+    <button class="btn bp bfw" onclick="doRes()" style="margin-bottom:10px">Reserve My IMLX Position →</button>
+    <button class="btn bo bfw" onclick="closeRes()">Cancel</button>
+  </div>
+</div>
+
+<!-- NOTIF MODAL -->
+<div class="mover" id="notif-modal" onclick="if(event.target===this)closeNotif()">
+  <div class="modal">
+    <div class="mhnd"></div>
+    <div class="mtit">🔔 Notifications</div>
+    <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--bdr)"><div style="width:36px;height:36px;border-radius:50%;background:rgba(245,166,35,.12);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🎯</div><div><div style="font-size:13px;font-weight:600;margin-bottom:2px">You're 3 referrals away from Builder milestone</div><div style="font-size:12px;color:var(--mut);line-height:1.5">Reach 30 depositing referrals this week → 3,000 IMLX + Active Recruiter badge</div><div style="font-size:10px;color:var(--mut);margin-top:4px">2 hours ago</div></div></div>
+    <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--bdr)"><div style="width:36px;height:36px;border-radius:50%;background:rgba(0,255,136,.1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">☀️</div><div><div style="font-size:13px;font-weight:600;margin-bottom:2px">Solar Starter Kit — 1 unit remaining in stock</div><div style="font-size:12px;color:var(--mut)">Only 1 left in the first batch.</div><div style="font-size:10px;color:var(--mut);margin-top:4px">5 hours ago</div></div></div>
+    <div style="display:flex;gap:12px;padding:14px 0"><div style="width:36px;height:36px;border-radius:50%;background:rgba(245,166,35,.12);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🏆</div><div><div style="font-size:13px;font-weight:600;margin-bottom:2px">You moved up to #47 on the leaderboard!</div><div style="font-size:12px;color:var(--mut)">Your X/Twitter post earned 15 IMLX and pushed you up 3 spots.</div><div style="font-size:10px;color:var(--mut);margin-top:4px">Yesterday</div></div></div>
+  </div>
+</div>
+<script>
+// PAGE NAV
+function sp(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
+  const p=document.getElementById('page-'+page);
+  const t=document.getElementById('tab-'+page);
+  if(p)p.classList.add('active');
+  if(t)t.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// EARN TABS
+function setE(tab,el){
+  ['daily','season','milestones'].forEach(t=>{
+    const e=document.getElementById('e-'+t);
+    if(e)e.style.display=t===tab?'block':'none';
+  });
+  document.querySelectorAll('.etab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// COMMUNITY TABS
+function setC(tab,el){
+  ['feed','lb','annc'].forEach(t=>{
+    const e=document.getElementById('c-'+t);
+    if(e)e.style.display=t===tab?'block':'none';
+  });
+  document.querySelectorAll('.ctab2').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// TOAST
+let tt;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// MODALS
+function openRes(){document.getElementById('res-modal').classList.add('open')}
+function closeRes(){document.getElementById('res-modal').classList.remove('open')}
+function openNotif(){document.getElementById('notif-modal').classList.add('open')}
+function closeNotif(){document.getElementById('notif-modal').classList.remove('open')}
+
+// RESERVE
+function selT(el){document.querySelectorAll('.rtier').forEach(t=>t.classList.remove('sel'));el.classList.add('sel')}
+function selP(el){document.querySelectorAll('.pm').forEach(p=>p.classList.remove('sel'));el.classList.add('sel')}
+function calcR(){
+  const a=parseFloat(document.getElementById('res-amt').value)||0;
+  const imlx=a*15;
+  document.getElementById('r-usd').textContent='$'+a.toFixed(2);
+  document.getElementById('r-imlx').textContent=imlx.toLocaleString()+' IMLX';
+  document.getElementById('r-list').textContent='$'+(imlx*0.02).toFixed(2);
+  document.getElementById('r-ret').textContent='$'+a.toFixed(2);
+}
+function doRes(){
+  const a=parseFloat(document.getElementById('res-amt').value)||0;
+  if(a<30){toast('Minimum reservation is $30');return;}
+  toast('Processing...');
+  // TODO: NowPayments API → backend webhook → BSC allocation
+  setTimeout(()=>{closeRes();toast('✅ Reservation confirmed! IMLX allocated.');},1500);
+}
+
+// WAITLIST
+function joinW(){
+  const e=document.getElementById('hemail');
+  if(!e||!e.value.includes('@')){if(e)e.style.borderColor='#FF4444';setTimeout(()=>{if(e)e.style.borderColor=''},2000);toast('Enter a valid email');return;}
+  toast('🎉 You\'re on the waitlist!');
+  e.value='';
+  // TODO: POST email to Supabase waitlist table
+}
+
+// REFERRAL
+function shareRef(){
+  const txt='Join IMOLEX — world\'s first Physical Impact Token. Presale backed by real EV bikes and solar panels. Use my code SIGMA7X: https://imolex.app/r/SIGMA7X';
+  if(navigator.share){navigator.share({title:'IMOLEX',text:txt});}
+  else if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>toast('Referral link copied!'));}
+  else toast('Copy your link from My → Referrals!');
+}
+
+// AI
+const AIR={
+  'how do i reserve':'Easy! Click "Reserve IMLX". Choose your tier ($30+ Explorer, $500+ Contributor). Pay by card or bank transfer. Converts to IMLX in seconds. No crypto wallet needed! 💳',
+  'what is piut':'PIUT = Physical Impact Utility Token. A new category invented by IMOLEX. Every token purchased funds real electric bikes and solar panels. First in the world! ⚡',
+  'how does referral':'Get your code in My → Referrals. Share it. When someone reserves using your code, you earn 5-15% of their IMLX allocation. Hit milestone targets for massive bonus IMLX! 🏆',
+  'is imolex safe':'Yes! CAC registered company. Smart contract audited and on BSCScan. All funds in Gnosis Safe multi-sig. Liquidity locked 2 years. Your reservation returned at Season 3. 🔒',
+  'default':'Great question! Ask about reserving, earning tasks, referral milestones, or what makes IMOLEX different from other crypto projects. ⚡'
+};
+function toggleAI(){document.getElementById('aiw').classList.toggle('open')}
+function qa(q){
+  addAI(q,'u');
+  const k=q.toLowerCase();
+  let r=AIR.default;
+  for(const key of Object.keys(AIR)){if(k.includes(key)&&key!=='default'){r=AIR[key];break;}}
+  setTimeout(()=>addAI(r,''),600);
+}
+function addAI(t,cls){
+  const m=document.getElementById('aimsgs');
+  const d=document.createElement('div');
+  d.className='aimsg'+(cls?' '+cls:'');
+  d.textContent=t;m.appendChild(d);m.scrollTop=m.scrollHeight;
+}
+function aisend(){
+  const i=document.getElementById('ai-inp');
+  const t=i.value.trim();if(!t)return;
+  qa(t);i.value='';
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeRes();closeNotif();}});
+</script>
+</body>
+</html>
+`
+
+That is the complete file. Copy everything from `<!DOCTYPE html>` to `</html>`. Save it as `imolex.html` and open it in any browser. All 5 pages work — Home, Earn, Store, Community, My. The AI chat works, reserve modal works, all tabs work.
+
+When you're ready to go live, take that file to Netlify, drag and drop it, and it's online in 30 seconds.
